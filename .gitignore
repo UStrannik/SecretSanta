@@ -1,0 +1,66 @@
+# === Qt Creator & User settings ===
+# Настройки пользователя, пути к компиляторам и сессии (самое важное!)
+*.user
+*.user.*
+*.autosave
+
+# === Сборка (Build directories) ===
+# Исключаем все папки, которые начинаются на build-
+build*/
+# Если сборка идет внутри папок bin или out
+bin/
+obj/
+out/
+release/
+
+# === CMake ===
+# Исключаем служебные файлы CMake, если проект на нем
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# === qmake ===
+# Временные файлы компиляции qmake
+.qmake.stash
+.qmake.cache
+Makefile*
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.prl
+
+# === Исполняемые файлы и отладка ===
+# Исключаем сгенерированные файлы сборки
+*.app
+*.ipa
+*.apk
+*.vcproj
+*.vcxproj
+*.sln
+*.pdb
+*.idb
+
+# === Сгенерированный код (Generated files) ===
+# Файлы, которые Qt генерирует из .ui, .qrc и заголовков
+ui_*.h
+qrc_*.cpp
+moc_*.cpp
+moc_predefs.h
+*-qmltypes.cpp
+
+# === Системные файлы ===
+.DS_Store
+Thumbs.db
+desktop.ini

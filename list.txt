@@ -1,0 +1,4 @@
+Имя1 Фамилия1 <email1@email.ru>
+Имя2 Фамилия2 <email2@email.ru>
+Имя3 Фамилия3 <email3@email.ru>
+Имя4 Фамилия4 <email4@email.ru>
