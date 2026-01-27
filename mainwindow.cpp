@@ -1,9 +1,9 @@
-#include "secretsanta.h"
+#include "mainwindow.h"
 #include <QtWidgets>
 #include <QSslSocket>
 
 // создаёт тело письма
-QByteArray SecretSanta::makeEmailBody(QString from, QString to, QString subj, QString msg)
+QByteArray MainWindow::makeEmailBody(QString from, QString to, QString subj, QString msg)
 {
     QByteArray email;
 
@@ -17,8 +17,8 @@ QByteArray SecretSanta::makeEmailBody(QString from, QString to, QString subj, QS
     return email;
 }
 
-// загрузка из файла
-bool SecretSanta::loadFromFile(QString fileName)
+// загрузка из файла !!! перенесена в DataSource
+bool MainWindow::loadFromFile(QString fileName)
 {
     QFile file = QFile(fileName);           // попытка открыть файл
     if(!file.open(QIODevice::ReadOnly))
@@ -46,10 +46,10 @@ bool SecretSanta::loadFromFile(QString fileName)
     file.close();                           // закрываем файл
 
     return !from.isEmpty();
-}
+} /**/
 
-// разбираем строки с именами и почтой
-bool SecretSanta::parseString(QString const &src, QString &name, QString &eml)
+// разбираем строки с именами и почтой !!! перенесена в DataSource
+bool MainWindow::parseString(QString const &src, QString &name, QString &eml)
 {
     // разбираем строку
     QRegularExpression nameMail("^(.+?)\\s*<(.+?)>$");
@@ -74,7 +74,7 @@ bool SecretSanta::parseString(QString const &src, QString &name, QString &eml)
 }
 
 // создание списка пар
-bool SecretSanta::pairing()
+bool MainWindow::pairing()
 {
     if (from.isEmpty())     // пустой список  невозможно перемешать
         return false;
@@ -100,7 +100,7 @@ bool SecretSanta::pairing()
 }
 
 // подключаемся к серверу
-bool SecretSanta::connectToSmtpServer(QString addr, QString port)
+bool MainWindow::connectToSmtpServer(QString addr, QString port)
 {
     if (socket.isOpen())    // закрыть сокет если открыт
         socket.close();
@@ -112,7 +112,7 @@ bool SecretSanta::connectToSmtpServer(QString addr, QString port)
 }
 
 // авторизуемся на сервере
-bool SecretSanta::loginOnSmtpServer(QString login, QString password)
+bool MainWindow::loginOnSmtpServer(QString login, QString password)
 {
     // авторизация по SMTP
     socket.write("EHLO myapp\r\n");
@@ -130,7 +130,7 @@ bool SecretSanta::loginOnSmtpServer(QString login, QString password)
 }
 
 // отправка письма
-bool SecretSanta::sendSmtpEmail(QString from, QString to, QString subj, QString msg)
+bool MainWindow::sendSmtpEmail(QString from, QString to, QString subj, QString msg)
 {
     // отправка заголовков
     socket.write("MAIL FROM:<" + from.toUtf8() + ">\r\n");
@@ -157,7 +157,7 @@ bool SecretSanta::sendSmtpEmail(QString from, QString to, QString subj, QString 
 }
 
 // завершение соединения с SMTP сервером
-void SecretSanta::closeSmtpConnection()
+void MainWindow::closeSmtpConnection()
 {
     socket.write("QUIT\r\n");
     socket.waitForReadyRead();
@@ -165,7 +165,7 @@ void SecretSanta::closeSmtpConnection()
 }
 
 // обновление данных в таблице
-void SecretSanta::updateTable()
+void MainWindow::updateTable()
 {
     clearTable();                           // очистка
     ptbwTable->setUpdatesEnabled(false);    // отключить перерисовку
@@ -199,13 +199,13 @@ void SecretSanta::updateTable()
 }
 
 // очистка таблицы с сохранением заголовков
-void SecretSanta::clearTable()
+void MainWindow::clearTable()
 {
     ptbwTable->setRowCount(0);
 }
 
 // конструктор ПРОВЕРИТЬ
-SecretSanta::SecretSanta(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     // заголовок окна
@@ -276,7 +276,7 @@ SecretSanta::SecretSanta(QWidget *parent)
 }
 
 // слот для кнопки загрузки из файла
-void SecretSanta::slotLoad()
+void MainWindow::slotLoad()
 {
 
     // диалог открытия файла
@@ -297,7 +297,7 @@ void SecretSanta::slotLoad()
 }
 
 // отправка тестового письма
-void SecretSanta::slotSendTest()
+void MainWindow::slotSendTest()
 {
     // попытка подключения к серверу
     if (!connectToSmtpServer(ptxtServer->text(), ptxtPort->text()))
@@ -329,7 +329,7 @@ void SecretSanta::slotSendTest()
     QMessageBox::information(this, "Информация", "Тестовое письмо отправлено, проверьте почтовый ящик.", QMessageBox::Ok);
 }
 
-void SecretSanta::slotSendSanta()
+void MainWindow::slotSendSanta()
 {
     QString allList = "";
 

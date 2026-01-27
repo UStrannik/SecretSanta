@@ -10,12 +10,15 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    datasource.cpp \
     main.cpp \
-    secretsanta.cpp
+    mainwindow.cpp
 
 HEADERS += \
+    datasource.h \
     delegats.h \
-    secretsanta.h
+    gamer.h \
+    mainwindow.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
