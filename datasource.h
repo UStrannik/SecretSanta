@@ -20,6 +20,9 @@ private:
     // парсинг строки
     bool parseString(QString const &src, Gamer &gamer);
 
+    // проверка правильности адреса email
+    bool checkEmail(QString email);
+
     // заполняет тестовыми данными для отладки
     void testData();
 
@@ -29,19 +32,15 @@ public:
     std::optional<int> loadFromFile(QString fileName);
 
     // возврат количества игроков
-    // TODO
     qsizetype getCount();
 
     // возврат игрока по константной ссылке по индексу
-    // TODO
-    const Gamer getGamer(qsizetype index);
+    QSharedPointer<const Gamer> getGamer(qsizetype index);
 
     // обновление данных об игроке по индексу
-    // TODO
     bool updateGamer(qsizetype index, Gamer gamer);
 
     // удаление игрока по индексу
-    // TODO
     bool deleteGamer(qsizetype index);
 
 

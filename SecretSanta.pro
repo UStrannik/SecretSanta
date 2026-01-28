@@ -11,6 +11,7 @@ CONFIG += c++17
 
 SOURCES += \
     datasource.cpp \
+    gamer.cpp \
     main.cpp \
     mainwindow.cpp
 

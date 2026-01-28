@@ -9,4 +9,16 @@ struct Gamer
 {
     QString name;   // имя
     QString email;  // почта
+
+    // конструктор без аргументов
+    Gamer();
+
+    // конструктор копирования
+    Gamer(Gamer &gamer);
+
+    // оператор присваивания
+    Gamer &operator=(const Gamer &gamer);
+
+    // деструктор
+    ~Gamer();
 };

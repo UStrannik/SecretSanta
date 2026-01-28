@@ -42,8 +42,7 @@ bool DataSource::parseString(const QString &src, Gamer &gamer)
 
     // проверяем корректность адреса почты
     // если это не почта, то возвращаем false
-    static const QRegularExpression validMail("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    if (!validMail.match(_email).hasMatch())
+    if (!checkEmail(_email))
         return false;
 
     // присваиваем данные структуре
@@ -52,6 +51,13 @@ bool DataSource::parseString(const QString &src, Gamer &gamer)
 
     // возвращаем успех
     return true;
+}
+
+// проверка правильности email
+bool DataSource::checkEmail(QString email)
+{
+    static const QRegularExpression validMail("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    return validMail.match(email).hasMatch();
 }
 
 // загрузка из файла
@@ -95,6 +101,52 @@ std::optional<int> DataSource::loadFromFile(QString fileName)
     // возвращаем количество прочитанных записей
     return counter;
 }
+
+// возвращает количество игроков
+qsizetype DataSource::getCount()
+{
+    return listOfGamers->size();
+}
+
+// возвращает указатель на запрошенного по индексу игрока
+QSharedPointer<const Gamer> DataSource::getGamer(qsizetype index)
+{
+    // вернуть указатель на запрошенного игрока
+    // если индекс за пределами диапазона, то верется nullptr
+    return listOfGamers->value(index);
+}
+
+bool DataSource::updateGamer(qsizetype index, Gamer gamer)
+{
+    // если индекс за пределами диапазона, то вернуть false
+    if (index < 0 || index >= getCount())
+        return false;
+
+    // если неправильный email, то вернуть false
+    if (!checkEmail(gamer.email))
+        return false;
+
+    // присвоить полученную структуру структуре,
+    // на которую указывает указатель, расположенный по
+    // переданному индексу
+    *(listOfGamers->at(index)) = gamer;
+
+    return true;
+}
+
+// удаление игрока
+bool DataSource::deleteGamer(qsizetype index)
+{
+    // если индекс за пределами диапазона, то вернуть false
+    if (index < 0 || index >= getCount())
+        return false;
+
+    // удалить игрока
+    listOfGamers->remove(index);
+
+    return true;
+}
+
 
 // для тестирования работы
 void DataSource::testData()
