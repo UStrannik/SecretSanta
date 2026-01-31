@@ -12,7 +12,7 @@ Gamer::Gamer()
  * правильно копировать что-то динамическое
  */
 
-Gamer::Gamer(Gamer &gamer)
+Gamer::Gamer(const Gamer &gamer)
 {
     this->email = gamer.email;
     this->name = gamer.name;

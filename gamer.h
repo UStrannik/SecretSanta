@@ -21,7 +21,7 @@ struct Gamer
     Gamer();
 
     // конструктор копирования
-    Gamer(Gamer &gamer);
+    Gamer(const Gamer &gamer);
 
     // оператор присваивания
     Gamer &operator=(const Gamer &gamer);

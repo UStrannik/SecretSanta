@@ -6,14 +6,13 @@
 #include <QtWidgets>
 #include <QList>
 #include <QSslSocket>
-#include <delegats.h>
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 private:
-    DataModel       *model;          // указатель на модель
+    DataModel       *model;         // указатель на модель
 
     QLabel          *plblServer;    // метка адрес сервера
     QLabel          *plblPort;      // метка порт сервера

@@ -136,8 +136,6 @@ MainWindow::MainWindow(DataModel *_model, QWidget *parent)
     // таблица
     ptbvTable = new QTableView;
     ptbvTable->setModel(model);
-    // отключить возможность редактирования элементов (делегат)
-    ptbvTable->setItemDelegate(new NonEditTableDelegate());
     pltMain->addWidget(ptbvTable);
 
     // блок информации о сервере

@@ -35,9 +35,9 @@ QVariant DataModel::data(const QModelIndex &index, int role) const
 
     // если индекс за пределами диапазона,
     // то вернуть пустой объект
-    if (index.row() < 0 || index.row() > (rowCount() - 1))
+    if (index.row() < 0 || index.row() >= rowCount())
         return QVariant();
-    if (index.column() < 0 || index.column() > (columnCount() - 1))
+    if (index.column() < 0 || index.column() >= columnCount())
         return QVariant();
 
     // если запрошенная роль НЕ отображение и НЕ редактирование,
@@ -55,3 +55,143 @@ QVariant DataModel::data(const QModelIndex &index, int role) const
     // если не нашлось вариантов, то возвращаем пустой объект
     return QVariant();
 }
+
+// изменяет данные
+bool DataModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    // если индекс не валидный, то вернуть false
+    if (!index.isValid())
+        return false;
+
+    // если индекс за пределами диапазона, то вернуть false
+    if (index.row() < 0 || index.row() >= rowCount())
+        return false;
+    if (index.column() < 0 || index.column() >= columnCount())
+        return false;
+
+    // если роль не EditRole, то вернуть false
+    if (role != Qt::EditRole)
+        return false;
+
+    // получаем нужного игрока и т.к. он константный,
+    // то копируем во временную структуру
+    Gamer tempGamer =*(dataSource->getGamer(index.row()));
+
+    // меняем нужное поле
+    switch (index.column())
+    {
+    case Gamer::NameColumn :
+        tempGamer.name = value.value<QString>();
+        break;
+
+    case Gamer::EmailColumn:
+        tempGamer.email = value.value<QString>();
+        break;
+    }
+
+    // запрашиваем изменения данных в DataSource. в случае успеха
+    // высылаем сигнал, что данные изменились и возвращаем true
+    if (dataSource->updateGamer(index.row(), tempGamer))
+    {
+        emit dataChanged(index, index);
+        return true;
+    }
+
+    // если сюда дошли, то что-то не так и возвращаем false
+    return false;
+}
+
+// добавляет игроков
+bool DataModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    // если предок есть, то вернуть false
+    if (parent.isValid())
+        return false;
+
+    // если позиция для вставки за пределами диапазона,
+    // то вернуть false
+    if (row < 0 || row > rowCount())
+        return false;
+
+    // сообщить о начале добавления
+    beginInsertRows(QModelIndex(), row, row + count - 1);
+
+    // добавить нужное количество игроков
+    // TODO неплохо бы добавить проверку на успешность добавления
+    for (int i = 0; i < count; i++)
+    {
+        Gamer gamer;
+        dataSource->insertGamer(row + i, gamer);
+    }
+
+    // сообщить о завершении добавления
+    endInsertRows();
+
+    return true;
+}
+
+bool DataModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    // если предок есть, то вернуть false;
+    if (parent.isValid())
+        return false;
+
+    // если позиция за пределами диапазона, то вернуть false
+    if (row < 0 || row >= rowCount())
+        return false;
+
+    // сообщить о начале удаления
+    beginRemoveRows(QModelIndex(), row, row + count - 1);
+
+    // удалить нужное количество игроков
+    // TODO неплохо бы добавить проверку на успешность удаления
+    for (int i = 0; i < count; i++)
+        dataSource->deleteGamer(row + i);
+
+    // сообщаем о завершении удаления
+    endRemoveRows();
+
+    return true;
+}
+
+// заголовки столбцов и номера строк
+QVariant DataModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    // если роль не DisplayRole, то вернуть пустой объект
+    if (role != Qt::DisplayRole)
+        return QVariant();
+
+    // если надо заголовок строки, то вернуть номер + 1
+    // чтобы нумерация была не с 0, а с 1
+    if (orientation == Qt::Vertical)
+        return QVariant(section + 1);
+
+    // определяем и возвращаем заголовок столбца
+    switch (section)
+    {
+        case Gamer::NameColumn : return QVariant("Имя");
+        case Gamer::EmailColumn: return QVariant("E-Mail");
+    }
+
+    // если не нашлось подходящего варианта,
+    // то возвращаем пустой объект
+    return QVariant();
+}
+
+// флаги
+Qt::ItemFlags DataModel::flags(const QModelIndex &index) const
+{
+    // если индекс не валидный, то возвращаем пустые флаги
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    // получаем флаги по умолчанию
+    Qt::ItemFlags flg = QAbstractTableModel::flags(index);
+
+    // добавляем возможность редактирования
+    flg = flg | Qt::ItemIsEditable;
+
+    // возвращаем итоговые флаги
+    return flg;
+}
+

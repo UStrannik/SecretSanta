@@ -40,6 +40,9 @@ public:
     // обновление данных об игроке по индексу
     bool updateGamer(qsizetype index, Gamer gamer);
 
+    // добавляет игрока в заданную позицию
+    bool insertGamer(qsizetype index, Gamer gamer);
+
     // удаление игрока по индексу
     bool deleteGamer(qsizetype index);
 

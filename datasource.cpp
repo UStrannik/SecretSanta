@@ -134,6 +134,26 @@ bool DataSource::updateGamer(qsizetype index, Gamer gamer)
     return true;
 }
 
+// добавляет игрока в заданную позицию
+bool DataSource::insertGamer(qsizetype index, Gamer gamer)
+{
+    // если позиция неверна, то вернуть false
+    if (index < 0 || index > getCount())
+        return false;
+
+    // если надо добавить в конец, до добавляем и возвращаем true
+    if (index == getCount())
+    {
+        listOfGamers->append(QSharedPointer<Gamer>::create(gamer));
+        return true;
+    }
+
+    // добавляем в заданную позицию
+    listOfGamers->insert(index, QSharedPointer<Gamer>::create(gamer));
+
+    return true;
+}
+
 // удаление игрока
 bool DataSource::deleteGamer(qsizetype index)
 {
