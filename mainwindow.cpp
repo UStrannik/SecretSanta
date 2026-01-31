@@ -17,65 +17,12 @@ QByteArray MainWindow::makeEmailBody(QString from, QString to, QString subj, QSt
     return email;
 }
 
-// загрузка из файла !!! перенесена в DataSource
-bool MainWindow::loadFromFile(QString fileName)
-{
-    QFile file = QFile(fileName);           // попытка открыть файл
-    if(!file.open(QIODevice::ReadOnly))
-        return false;                      // возврат в случае неудачи
-
-    QTextStream txt = QTextStream(&file);   // текстовый поток
-    QString dataLine;                       // прочитанная строка
-    QString name;                           // имя
-    QString eml;                            // почта
-    Member *member = nullptr;               // указатель на структуру участника
-
-    from.clear();                           // очистка списка отправителей
-
-    while(!txt.atEnd())                     // читаем построчно весь файл
-    {
-        dataLine = txt.readLine();
-        if (!parseString(dataLine, name, eml))
-            continue;
-        member = new Member;
-        member->name = name;
-        member->email = eml;
-        from.push_back(member);
-    }
-
-    file.close();                           // закрываем файл
-
-    return !from.isEmpty();
-} /**/
-
-// разбираем строки с именами и почтой !!! перенесена в DataSource
-bool MainWindow::parseString(QString const &src, QString &name, QString &eml)
-{
-    // разбираем строку
-    QRegularExpression nameMail("^(.+?)\\s*<(.+?)>$");
-    QRegularExpressionMatch match = nameMail.match(src);
-    if (!match.hasMatch())      // если не смогли, то возвращаем false
-        return false;
-
-    QString _name = match.captured(1).trimmed(); // получаем имя
-    QString _eml = match.captured(2).trimmed(); // получаем email
-
-    // проверяем корректность адреса почты
-    QRegularExpression validMail("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    bool goodMail = validMail.match(_eml).hasMatch();
-    if (!goodMail)          // если это не почта, то возвращаем false
-        return false;
-
-    // присваиваем данные
-    name = _name;
-    eml = _eml;
-
-    return true;
-}
-
 // создание списка пар
 bool MainWindow::pairing()
 {
+    /* TODO
+     * вынести реализацию в модель
+     *
     if (from.isEmpty())     // пустой список  невозможно перемешать
         return false;
 
@@ -89,12 +36,14 @@ bool MainWindow::pairing()
      * Идем по списку от конца к началу. На каждом шаге генерируем случайное j,
      * которое обязательно меньше i. Меняем местами элементы i и j. Получаем
      * список, в которое все элементы сменили свою позицию.
-     */
+     *
     int j = 0;
     for (int i = n - 1; i > 0; --i) {
         j = QRandomGenerator::global()->bounded(i);
         to.swapItemsAt(i, j);
     }
+
+    */
 
     return true;
 }
@@ -164,50 +113,14 @@ void MainWindow::closeSmtpConnection()
     socket.close();
 }
 
-// обновление данных в таблице
-void MainWindow::updateTable()
-{
-    clearTable();                           // очистка
-    ptbwTable->setUpdatesEnabled(false);    // отключить перерисовку
-    ptbwTable->setRowCount(from.size());    // число строк по числу объектов в исходном списке
 
-    QTableWidgetItem *itm = nullptr;
-
-    for (int i = 0; i < from.size(); ++i)  // проход по исходному списку
-    {
-        itm = new QTableWidgetItem;
-        itm->setText(from[i]->name);
-        ptbwTable->setItem(i, 0, itm);
-
-        itm = new QTableWidgetItem;
-        itm->setText(from[i]->email);
-        ptbwTable->setItem(i, 1, itm);
-    }
-
-    for (int i = 0; i < to.size(); ++i)     // проход по списку одаряемых
-    {
-        itm = new QTableWidgetItem;
-        itm->setText(to[i]->name);
-        ptbwTable->setItem(i, 2, itm);
-
-        itm = new QTableWidgetItem;
-        itm->setText(to[i]->email);
-        ptbwTable->setItem(i, 3, itm);
-    }
-
-    ptbwTable->setUpdatesEnabled(true);     // включить перерисовку
-}
-
-// очистка таблицы с сохранением заголовков
-void MainWindow::clearTable()
-{
-    ptbwTable->setRowCount(0);
-}
-
-// конструктор ПРОВЕРИТЬ
-MainWindow::MainWindow(QWidget *parent)
+// конструктор
+MainWindow::MainWindow(DataModel *_model, QWidget *parent)
     : QMainWindow(parent)
 {
+    // сохраняем указатель на модель
+    model = _model;
+
     // заголовок окна
     setWindowTitle("Тайный Санта");
 
@@ -221,19 +134,11 @@ MainWindow::MainWindow(QWidget *parent)
     pltMain->addWidget(pbtnOpenFile);
 
     // таблица
-    ptbwTable = new QTableWidget;
-    ptbwTable->setColumnCount(4);
-    ptbwTable->setColumnWidth(0, 150);
-    ptbwTable->setColumnWidth(1, 150);
-    ptbwTable->setColumnWidth(2, 150);
-    ptbwTable->setColumnWidth(3, 150);
-    ptbwTable->setHorizontalHeaderLabels({"Name", "Mail", "To name", "To mail"});
-    // скрыть столбцы с получателями
-    ptbwTable->hideColumn(2);   //
-    ptbwTable->hideColumn(3);   //
+    ptbvTable = new QTableView;
+    ptbvTable->setModel(model);
     // отключить возможность редактирования элементов (делегат)
-    ptbwTable->setItemDelegate(new NonEditTableDelegate());
-    pltMain->addWidget(ptbwTable);
+    ptbvTable->setItemDelegate(new NonEditTableDelegate());
+    pltMain->addWidget(ptbvTable);
 
     // блок информации о сервере
     QHBoxLayout *pltMailSend = new QHBoxLayout;
@@ -278,27 +183,16 @@ MainWindow::MainWindow(QWidget *parent)
 // слот для кнопки загрузки из файла
 void MainWindow::slotLoad()
 {
-
-    // диалог открытия файла
-    QString fileName = QFileDialog::getOpenFileName();
-
-    if (fileName.isEmpty())         // если пользователь отказался, то возврат
-        return;
-
-    if (!loadFromFile(fileName))    // попытка загрузки из файла
-        return;                     // при неудаче - возврат
-
-    if (!pairing())                 // попытка создания списка пар
-        return;                     // при неудаче - возврат
-
-    updateTable();                  // обновить таблицу в окне
-
-    pbtnSendSanta->setEnabled(true);// сделать активной кнопку рассылки
+    // TODO
+    // реализовать загрузку через модель
 }
 
 // отправка тестового письма
 void MainWindow::slotSendTest()
 {
+    /* TODO
+     * реализовать в классе работы с почтой
+     *
     // попытка подключения к серверу
     if (!connectToSmtpServer(ptxtServer->text(), ptxtPort->text()))
     {
@@ -327,10 +221,14 @@ void MainWindow::slotSendTest()
 
     // уведомление об успехе
     QMessageBox::information(this, "Информация", "Тестовое письмо отправлено, проверьте почтовый ящик.", QMessageBox::Ok);
+
+    */
 }
 
 void MainWindow::slotSendSanta()
 {
+    /* TODO
+     * вынести в отдельный класс
     QString allList = "";
 
     QString sender = ptxtUser->text();
@@ -377,4 +275,6 @@ void MainWindow::slotSendSanta()
     closeSmtpConnection(); // завершение соединения
 
     pbtnSendSanta->setEnabled(false);
+
+    */
 }

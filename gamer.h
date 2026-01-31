@@ -10,6 +10,13 @@ struct Gamer
     QString name;   // имя
     QString email;  // почта
 
+    /*
+     * названия столбцов для отображения
+     * Count всегда должно быть последним - это надо
+     * для определения количества столбцов
+     */
+    enum сolumns { NameColumn, EmailColumn, Count };
+
     // конструктор без аргументов
     Gamer();
 

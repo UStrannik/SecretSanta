@@ -1,5 +1,7 @@
 #pragma once
 
+#include "datamodel.h"
+
 #include <QMainWindow>
 #include <QtWidgets>
 #include <QList>
@@ -11,17 +13,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    /* перенесено в класс DataSource */
-    struct Member                   // участник
-    {
-        QString name;   // имя
-        QString email;  // почта
-    };
-
-    QList<Member*> from;            // список участников
-    /**/
-
-    QList<Member*> to;              // список пар для участников
+    DataModel       *model;          // указатель на модель
 
     QLabel          *plblServer;    // метка адрес сервера
     QLabel          *plblPort;      // метка порт сервера
@@ -37,14 +29,10 @@ private:
     QPushButton     *pbtnTestMail;  // кнопка отправки тестового письма
     QPushButton     *pbtnSendSanta; // кнопка запуска рассылки
 
-    QTableWidget    *ptbwTable;     // таблица со списком рассылки
+    QTableView       *ptbvTable;     // таблица со списком рассылки
 
     QSslSocket socket;              // сокет для подключений
 
-    /* работа с файлами !!! перенесено в класс DataSource */
-    bool loadFromFile(QString fileName);                                            // загрузка из файла
-    bool parseString(QString const &src, QString &name, QString &eml);              // разбирает строку на имя и почту
-    /**/
 
     /* работа с данными */
     bool pairing();                 // создание пар участников
@@ -61,7 +49,7 @@ private:
     void clearTable();                                                              // очистка списка в окне
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(DataModel *_model, QWidget *parent = nullptr);
 
 public slots:
     void slotLoad();
