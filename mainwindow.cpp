@@ -32,7 +32,7 @@ bool MainWindow::pairing()
     if (n == 1)             // если в списке только один элемент,
         return true;        // то его не надо перемешивать
 
-    /*
+
      * Идем по списку от конца к началу. На каждом шаге генерируем случайное j,
      * которое обязательно меньше i. Меняем местами элементы i и j. Получаем
      * список, в которое все элементы сменили свою позицию.
@@ -119,7 +119,7 @@ MainWindow::MainWindow(DataModel *_model, QWidget *parent)
     : QMainWindow(parent)
 {
     // сохраняем указатель на модель
-    model = _model;
+    dataModel = _model;
 
     // заголовок окна
     setWindowTitle("Тайный Санта");
@@ -129,13 +129,13 @@ MainWindow::MainWindow(DataModel *_model, QWidget *parent)
     QVBoxLayout *pltMain = new QVBoxLayout;
 
     // блок ввода данных
-    pbtnOpenFile = new QPushButton("Загрузить список...");
+    pbtnOpenFile = new QPushButton("Загрузить из файла...");
     connect(pbtnOpenFile, SIGNAL(clicked(bool)), SLOT(slotLoad()));
     pltMain->addWidget(pbtnOpenFile);
 
     // таблица
     ptbvTable = new QTableView;
-    ptbvTable->setModel(model);
+    ptbvTable->setModel(dataModel);
     pltMain->addWidget(ptbvTable);
 
     // блок информации о сервере
@@ -181,8 +181,16 @@ MainWindow::MainWindow(DataModel *_model, QWidget *parent)
 // слот для кнопки загрузки из файла
 void MainWindow::slotLoad()
 {
-    // TODO
-    // реализовать загрузку через модель
+    // показать диалог открытия файла
+    QString filter = "Текстовый документ (*.txt);;Все файлы (*.*)";
+    QString fileName = QFileDialog::getOpenFileName(this, "Открыть файл...", "", filter);
+
+    // если пользователь нажал Отмена, то возврат
+    if (fileName.isEmpty())
+        return;
+
+    // просим модель загрузить данные из файла
+    dataModel->loadFromFile(fileName);
 }
 
 // отправка тестового письма

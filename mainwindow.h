@@ -12,7 +12,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    DataModel       *model;         // указатель на модель
+    DataModel       *dataModel;         // указатель на модель
 
     QLabel          *plblServer;    // метка адрес сервера
     QLabel          *plblPort;      // метка порт сервера

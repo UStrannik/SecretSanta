@@ -195,3 +195,20 @@ Qt::ItemFlags DataModel::flags(const QModelIndex &index) const
     return flg;
 }
 
+// обработка запроса пользователя на загрузку из файла
+void DataModel::loadFromFile(QString fileName)
+{
+    // предупреждаем о возможном изменении данных
+    emit layoutAboutToBeChanged();
+
+    // просим DataSource загрузить данные из выбранного пользователем файла
+    // в ответ получим количество загруженных записей
+    /*std::optional<int> loaded = */dataSource->loadFromFile(fileName);
+
+    // высылаем сигнал об изменении данных
+    emit layoutChanged();
+
+    // TODO добавить сигнал с количеством загруженных данных
+    // для отображения в строке состояния главного окна
+}
+

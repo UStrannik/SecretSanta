@@ -15,6 +15,7 @@ public:
     // конструкторы
     explicit DataModel(DataSource *_data, QObject *parent = nullptr);
 
+
     // количество строк
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     // количество столбцов
@@ -37,4 +38,7 @@ public:
 
     // флаги
     Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+    // загрузка данных из файла
+    void loadFromFile(QString fileName);
 };
