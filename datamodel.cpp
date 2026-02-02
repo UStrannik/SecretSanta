@@ -212,3 +212,16 @@ void DataModel::loadFromFile(QString fileName)
     // для отображения в строке состояния главного окна
 }
 
+// очистка данных
+void DataModel::clearData()
+{
+    // предупреждаем о предстоящем изменении данных
+    beginResetModel();
+
+    // просим DataSource очистить данные
+    dataSource->clearData();
+
+    // сообщаем об окончании манипуляций
+    endResetModel();
+}
+

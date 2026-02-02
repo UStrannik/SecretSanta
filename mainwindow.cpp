@@ -128,10 +128,15 @@ MainWindow::MainWindow(DataModel *_model, QWidget *parent)
     QWidget *pwgtMain = new QWidget;
     QVBoxLayout *pltMain = new QVBoxLayout;
 
-    // блок ввода данных
+    // блок работы с данными
+    QHBoxLayout *pltData = new QHBoxLayout;
+    pbtnClearData = new QPushButton("Очистить список...");
+    connect(pbtnClearData, &QPushButton::clicked, this, &MainWindow::slotClearData);
+    pltData->addWidget(pbtnClearData);
     pbtnOpenFile = new QPushButton("Загрузить из файла...");
     connect(pbtnOpenFile, SIGNAL(clicked(bool)), SLOT(slotLoad()));
-    pltMain->addWidget(pbtnOpenFile);
+    pltData->addWidget(pbtnOpenFile);
+    pltMain->addLayout(pltData);
 
     // таблица
     ptbvTable = new QTableView;
@@ -176,6 +181,22 @@ MainWindow::MainWindow(DataModel *_model, QWidget *parent)
     // добавление главного виджета в окно
     pwgtMain->setLayout(pltMain);
     setCentralWidget(pwgtMain);
+}
+
+// слот очистки данных
+void MainWindow::slotClearData()
+{
+    // вы уверены?
+    auto res = QMessageBox::warning(this, "Внимание!",
+                                    "Вы действительно хотите удалить все данные из списка?",
+                                    QMessageBox::Yes | QMessageBox::No);
+
+    // если пользователь отказался, то возврат
+    if (res == QMessageBox::No)
+        return;
+
+    // просим модель очистить все данные
+    dataModel->clearData();
 }
 
 // слот для кнопки загрузки из файла

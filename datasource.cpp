@@ -167,6 +167,16 @@ bool DataSource::deleteGamer(qsizetype index)
     return true;
 }
 
+// удаление всех игроков
+bool DataSource::clearData()
+{
+    // очищаем список игроков
+    // игроки удалятся сами т.к. в списке указатели QSharedPointer
+    listOfGamers->clear();
+
+    return true;
+}
+
 
 // для тестирования работы
 void DataSource::testData()

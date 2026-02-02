@@ -24,6 +24,7 @@ private:
     QLineEdit       *ptxtUser;      // поле ввода логина
     QLineEdit       *ptxtPassword;  // поле ввода пароля
 
+    QPushButton     *pbtnClearData; // кнопка очистки данных
     QPushButton     *pbtnOpenFile;  // кнопка загрузки из файла
     QPushButton     *pbtnTestMail;  // кнопка отправки тестового письма
     QPushButton     *pbtnSendSanta; // кнопка запуска рассылки
@@ -51,6 +52,7 @@ public:
     MainWindow(DataModel *_model, QWidget *parent = nullptr);
 
 public slots:
+    void slotClearData();
     void slotLoad();
     void slotSendTest();
     void slotSendSanta();

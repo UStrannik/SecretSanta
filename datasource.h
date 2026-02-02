@@ -46,6 +46,9 @@ public:
     // удаление игрока по индексу
     bool deleteGamer(qsizetype index);
 
+    // удаление всех игроков
+    bool clearData();
+
 
 signals:
 

@@ -41,4 +41,7 @@ public:
 
     // загрузка данных из файла
     void loadFromFile(QString fileName);
+
+    // очистка данных
+    void clearData();
 };
