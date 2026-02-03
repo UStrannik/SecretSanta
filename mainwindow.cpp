@@ -17,37 +17,6 @@ QByteArray MainWindow::makeEmailBody(QString from, QString to, QString subj, QSt
     return email;
 }
 
-// создание списка пар
-bool MainWindow::pairing()
-{
-    /* TODO
-     * вынести реализацию в модель
-     *
-    if (from.isEmpty())     // пустой список  невозможно перемешать
-        return false;
-
-    to = from;              // копируем список отправителей в список получателей
-    int n = to.size();      // получаем размер списка
-
-    if (n == 1)             // если в списке только один элемент,
-        return true;        // то его не надо перемешивать
-
-
-     * Идем по списку от конца к началу. На каждом шаге генерируем случайное j,
-     * которое обязательно меньше i. Меняем местами элементы i и j. Получаем
-     * список, в которое все элементы сменили свою позицию.
-     *
-    int j = 0;
-    for (int i = n - 1; i > 0; --i) {
-        j = QRandomGenerator::global()->bounded(i);
-        to.swapItemsAt(i, j);
-    }
-
-    */
-
-    return true;
-}
-
 // подключаемся к серверу
 bool MainWindow::connectToSmtpServer(QString addr, QString port)
 {
@@ -132,6 +101,7 @@ MainWindow::MainWindow(DataModel *_model, QWidget *parent)
     QHBoxLayout *pltData = new QHBoxLayout;
     pbtnClearData = new QPushButton("Очистить список...");
     connect(pbtnClearData, &QPushButton::clicked, this, &MainWindow::slotClearData);
+    pbtnClearData->setVisible(false);   // в версии 1.0.1 не должно быть этого функционала
     pltData->addWidget(pbtnClearData);
     pbtnOpenFile = new QPushButton("Загрузить из файла...");
     connect(pbtnOpenFile, SIGNAL(clicked(bool)), SLOT(slotLoad()));
@@ -170,7 +140,7 @@ MainWindow::MainWindow(DataModel *_model, QWidget *parent)
     connect(pbtnTestMail, SIGNAL(clicked(bool)), SLOT(slotSendTest()));
     pbtnSendSanta = new QPushButton("Рассылка");
     connect(pbtnSendSanta, SIGNAL(clicked(bool)), SLOT(slotSendSanta()));
-    pbtnSendSanta->setEnabled(false);
+    //pbtnSendSanta->setEnabled(false);
     pltButtons->addStretch();
     pltButtons->addWidget(pbtnTestMail);
     pltButtons->addWidget(pbtnSendSanta);
@@ -254,6 +224,7 @@ void MainWindow::slotSendTest()
 
 void MainWindow::slotSendSanta()
 {
+    dataModel->mailing();
     /* TODO
      * вынести в отдельный класс
     QString allList = "";

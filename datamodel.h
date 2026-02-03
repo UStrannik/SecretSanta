@@ -44,4 +44,11 @@ public:
 
     // очистка данных
     void clearData();
+
+    // рассылка
+    std::optional<int> mailing();
+
+private:
+    // создание пар
+    QVector<int> pairing();
 };

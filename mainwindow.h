@@ -33,10 +33,6 @@ private:
 
     QSslSocket socket;              // сокет для подключений
 
-
-    /* работа с данными */
-    bool pairing();                 // создание пар участников
-
     /* работа с почтой */
     QByteArray makeEmailBody(QString from, QString to, QString subj, QString msg);  // формирует письмо
     bool connectToSmtpServer(QString addr, QString port);                           // подключается к серверу

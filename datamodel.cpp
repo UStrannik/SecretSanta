@@ -1,5 +1,7 @@
 #include "datamodel.h"
 
+#include <QRandomGenerator>
+
 // конструктор
 DataModel::DataModel(DataSource *_data, QObject *parent)
     : QAbstractTableModel{parent}
@@ -223,5 +225,53 @@ void DataModel::clearData()
 
     // сообщаем об окончании манипуляций
     endResetModel();
+}
+
+// рассылка
+std::optional<int> DataModel::mailing()
+{
+    // если игроков нет, то возвращаем пустоту
+    if (dataSource->getCount() == 0)
+        return std::nullopt;
+
+    // создаем пары
+    QVector<int> pair(pairing());
+
+    return 0;
+
+}
+
+// создание пар
+QVector<int> DataModel::pairing()
+{
+    // запрашиваем количество игроков
+    int count = dataSource->getCount();
+
+    // создаем вектор и заполняем индексами игроков
+    QVector<int> pair(count);
+    for (int i = 0; i < count; i++)
+        pair[i] = i;
+
+    // если игроков больше одного, то перемешиваем индексы
+    if (count > 1)
+    {
+        /*
+         * Идем по списку от конца к началу. На каждом шаге генерируем случайное j,
+         * которое обязательно меньше i. Меняем местами элементы i и j. Получаем
+         * список, в которое все элементы сменили свою позицию.
+         */
+        int j = 0;
+        for (int i = count - 1; i > 0; --i)
+        {
+            j = QRandomGenerator::global()->bounded(i);
+            pair.swapItemsAt(i, j);
+        }
+    }
+
+    // debug
+    for (int i = 0; i < count; i++)
+        qDebug() << i << " -> " << pair[i];
+
+    return pair;
 }
 
