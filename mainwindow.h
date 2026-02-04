@@ -12,7 +12,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    DataModel       *dataModel;         // указатель на модель
+    DataModel       *dataModel;     // указатель на модель
+    QProgressDialog *progressWindow;// указатель на окно прогресса выполнения действий
 
     QLabel          *plblServer;    // метка адрес сервера
     QLabel          *plblPort;      // метка порт сервера
@@ -29,7 +30,7 @@ private:
     QPushButton     *pbtnTestMail;  // кнопка отправки тестового письма
     QPushButton     *pbtnSendSanta; // кнопка запуска рассылки
 
-    QTableView       *ptbvTable;     // таблица со списком рассылки
+    QTableView       *ptbvTable;    // таблица со списком игроков
 
     QSslSocket socket;              // сокет для подключений
 
@@ -52,4 +53,6 @@ public slots:
     void slotLoad();
     void slotSendTest();
     void slotSendSanta();
+    void slotShowProgressWindow();
+    void slotCloseProgressWindow();
 };

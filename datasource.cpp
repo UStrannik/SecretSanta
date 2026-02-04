@@ -108,6 +108,12 @@ qsizetype DataSource::getCount()
     return listOfGamers->size();
 }
 
+// возвращает всех игроков
+QList<QSharedPointer<Gamer> > DataSource::getAllGamers()
+{
+    return *listOfGamers;
+}
+
 // возвращает указатель на запрошенного по индексу игрока
 QSharedPointer<const Gamer> DataSource::getGamer(qsizetype index)
 {

@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include <QtWidgets>
 #include <QSslSocket>
+#include <QKeyEvent>
+#include <QEvent>
 
 // создаёт тело письма
 QByteArray MainWindow::makeEmailBody(QString from, QString to, QString subj, QString msg)
@@ -140,6 +142,8 @@ MainWindow::MainWindow(DataModel *_model, QWidget *parent)
     connect(pbtnTestMail, SIGNAL(clicked(bool)), SLOT(slotSendTest()));
     pbtnSendSanta = new QPushButton("Рассылка");
     connect(pbtnSendSanta, SIGNAL(clicked(bool)), SLOT(slotSendSanta()));
+    connect(dataModel, &DataModel::beginMessaging, this, &MainWindow::slotShowProgressWindow);
+    connect(dataModel, &DataModel::endMessaging, this, &MainWindow::slotCloseProgressWindow);
     //pbtnSendSanta->setEnabled(false);
     pltButtons->addStretch();
     pltButtons->addWidget(pbtnTestMail);
@@ -275,4 +279,32 @@ void MainWindow::slotSendSanta()
     pbtnSendSanta->setEnabled(false);
 
     */
+}
+
+// отобразить окно процесса
+void MainWindow::slotShowProgressWindow()
+{
+    // создаем новое
+    progressWindow = new QProgressDialog("Отправка", "Отмена", 0, 0, this);
+
+    // делаем модальным
+    progressWindow->setWindowModality(Qt::WindowModal);
+
+    // убираем кнопку Отмена
+    progressWindow->setCancelButton(nullptr);
+
+    // убираем строку заголовка
+    progressWindow->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+
+    //TODO пофиксить возможность закрытия о кна кнопкой Esc
+
+    // отображаем
+    progressWindow->show();
+}
+
+// закрыть окно прогресса
+void MainWindow::slotCloseProgressWindow()
+{
+    progressWindow->accept();
+    delete progressWindow;
 }

@@ -34,6 +34,9 @@ public:
     // возврат количества игроков
     qsizetype getCount();
 
+    // возврат всех игроков
+    QList<QSharedPointer<Gamer>> getAllGamers();
+
     // возврат игрока по константной ссылке по индексу
     QSharedPointer<const Gamer> getGamer(qsizetype index);
 

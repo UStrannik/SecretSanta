@@ -1,6 +1,9 @@
 #include "datamodel.h"
 
+#include "mailsend.h"
+
 #include <QRandomGenerator>
+#include <QtConcurrent>
 
 // конструктор
 DataModel::DataModel(DataSource *_data, QObject *parent)
@@ -132,6 +135,7 @@ bool DataModel::insertRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
+// удаляет игроков
 bool DataModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     // если предок есть, то вернуть false;
@@ -228,24 +232,46 @@ void DataModel::clearData()
 }
 
 // рассылка
-std::optional<int> DataModel::mailing()
+bool DataModel::mailing()
 {
     // если игроков нет, то возвращаем пустоту
     if (dataSource->getCount() == 0)
-        return std::nullopt;
+        return false;
+
+    // получаем копию списка всех указателей на игроков
+    QList<QSharedPointer<Gamer>> listOfGamers(dataSource->getAllGamers());
 
     // создаем пары
-    QVector<int> pair(pairing());
+    pairing(listOfGamers);
 
-    return 0;
+    // выносим рассылку в фоновый поток
+    (void)QtConcurrent::run([&]()
+                      {
+                        // отправка сигнала о н ачале вычислений
+                        emit beginMessaging(0);
+
+                        MailSend mailSend;
+                        mailSend.sendAll(listOfGamers);
+
+                        // отправка сигнала с результатом
+                        emit endMessaging(*(new QList<QSharedPointer<Gamer>>), *(new QList<QSharedPointer<Gamer>>));
+                      });
+
+    // TODO добавить очистку пар
+
+    return true;
 
 }
 
 // создание пар
-QVector<int> DataModel::pairing()
+bool DataModel::pairing(QList<QSharedPointer<Gamer>> &listOfGamers)
 {
-    // запрашиваем количество игроков
-    int count = dataSource->getCount();
+    // получаем количество игроков
+    int count = listOfGamers.size();
+
+    // если список пуст, то возвращаем false
+    if (count ==0)
+        return false;
 
     // создаем вектор и заполняем индексами игроков
     QVector<int> pair(count);
@@ -272,6 +298,10 @@ QVector<int> DataModel::pairing()
     for (int i = 0; i < count; i++)
         qDebug() << i << " -> " << pair[i];
 
-    return pair;
+    // заносим указатели на пары в список
+    for (int i = 0; i < count; i++)
+        listOfGamers.at(i)->mailTo = listOfGamers.at(pair[i]).data();
+
+    return true;
 }
 

@@ -9,6 +9,7 @@ struct Gamer
 {
     QString name;   // имя
     QString email;  // почта
+    Gamer *mailTo;  // указатель на получателя
 
     /*
      * названия столбцов для отображения

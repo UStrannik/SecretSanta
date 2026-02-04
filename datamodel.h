@@ -46,9 +46,17 @@ public:
     void clearData();
 
     // рассылка
-    std::optional<int> mailing();
+    bool mailing();
 
 private:
     // создание пар
-    QVector<int> pairing();
+    bool pairing(QList<QSharedPointer<Gamer>> &listOfGamers);
+
+signals:
+    // высылается перед началом вычислений
+    void beginMessaging(int count);
+
+    // высылается после окончания рассылки
+    void endMessaging(QList<QSharedPointer<Gamer>> good,
+                      QList<QSharedPointer<Gamer>> bad);
 };

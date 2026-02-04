@@ -1,5 +1,6 @@
 QT       += core gui
 QT       += network
+QT       += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,6 +14,7 @@ SOURCES += \
     datamodel.cpp \
     datasource.cpp \
     gamer.cpp \
+    mailsend.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -21,6 +23,7 @@ HEADERS += \
     datasource.h \
     delegats.h \
     gamer.h \
+    mailsend.h \
     mainwindow.h
 
 # Default rules for deployment.
