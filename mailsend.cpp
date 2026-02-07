@@ -228,7 +228,7 @@ bool MailSend::sendForGamers(int n)
             // устанока статуса отправки для игрока
             listOfGamers.at(j)->sended = isGood;
 
-            qDebug() << "Отправили успешно на " + listOfGamers.at(j)->email;
+            qDebug() << "Отправка " << isGood << " на " << listOfGamers.at(j)->email;
         }
 
         // отключение от сервера
@@ -240,26 +240,29 @@ bool MailSend::sendForGamers(int n)
 // отправляет организатору список пар
 bool MailSend::sendList()
 {
-    // подключение к серверу, если не удалось, то возврат
-    if (!connectToSmtpServer())
-    {
-        sslSocket.close();
-        qDebug() << "Список. Не удалось подключиться к серверу";
-        return false;
-    }
+    // успешность отправки
+    bool isGood;
 
-    // авторизация на сервере, если не удалось, то возврат
-    if (!loginOnSmtpServer())
-    {
-        closeSmtpConnection();
-        qDebug() << "Список. Не удалось авторизоваться на сервере";
-        return false;
-    }
+   // подключение к серверу, если не удалось, то пропускаем попытку
+        if (!connectToSmtpServer())
+        {
+            sslSocket.close();
+            qDebug() << "Список. Не удалось подключиться к серверу";
+            return false;
+        }
 
-    // пытаемся отправить список
-    bool isGood = sendSmtpEmail(serverLogin, makeListEmail());
+        // авторизация на сервере, если не удалось, то пропускаем поппытку
+        if (!loginOnSmtpServer())
+        {
+            closeSmtpConnection();
+            qDebug() << "Список. Не удалось авторизоваться на сервере";
+            return false;
+        }
 
-    qDebug() << "Отправка списка: " << isGood;
+        // пытаемся отправить список
+        isGood = sendSmtpEmail(serverLogin, makeListEmail());
+
+        qDebug() << "Отправка списка: " << isGood;
 
     return isGood;
 }

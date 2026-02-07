@@ -160,17 +160,21 @@ bool DataModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-// заголовки столбцов и номера строк
+// заголовки столбцов и строк
 QVariant DataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     // если роль не DisplayRole, то вернуть пустой объект
     if (role != Qt::DisplayRole)
         return QVariant();
 
-    // если надо заголовок строки, то вернуть номер + 1
-    // чтобы нумерация была не с 0, а с 1
+    // если надо заголовок строки, то вернуть "-" если
+    // этому игроку не отправлялось письмо и "+" если отправлялось
     if (orientation == Qt::Vertical)
-        return QVariant(section + 1);
+        switch (dataSource->getGamer(section)->sended)
+        {
+            case true: return QVariant(" + ");
+            case false: return QVariant(" - ");
+        }
 
     // определяем и возвращаем заголовок столбца
     switch (section)
@@ -256,6 +260,9 @@ bool DataModel::mailing(QString serverAddress, int serverPort, QString serverLog
                         // отправка сигнала окончания
                         emit endMessaging();
                       });
+
+    // обновляем заголовки строк чтобы увидеть кому отправили
+    emit headerDataChanged(Qt::Vertical, 0, rowCount() - 1);
 
     // TODO добавить очистку пар
 
