@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent, DataModel *_model)
     pbtnClearData->setVisible(false);   // в версии 1.0.1 не должно быть этого функционала
     pltData->addWidget(pbtnClearData);
     pbtnOpenFile = new QPushButton("Загрузить из файла...");
-    connect(pbtnOpenFile, SIGNAL(clicked(bool)), SLOT(slotLoad()));
+    connect(pbtnOpenFile, &QPushButton::clicked, this, &MainWindow::slotLoadFromFile);
     pltData->addWidget(pbtnOpenFile);
     pltMain->addLayout(pltData);
 
@@ -55,9 +55,9 @@ MainWindow::MainWindow(QWidget *parent, DataModel *_model)
     // блок кнопок отправки писем
     QVBoxLayout *pltButtons = new QVBoxLayout;
     pbtnTestMail = new QPushButton("Тестовое письмо");
-    connect(pbtnTestMail, SIGNAL(clicked(bool)), SLOT(slotSendTest()));
+    connect(pbtnTestMail, &QPushButton::clicked, this, &MainWindow::slotTestEmail);
     pbtnSendSanta = new QPushButton("Рассылка");
-    connect(pbtnSendSanta, SIGNAL(clicked(bool)), SLOT(slotSendSanta()));
+    connect(pbtnSendSanta, &QPushButton::clicked, this, &MainWindow::slotSendSanta);
     connect(dataModel, &DataModel::beginMessaging, this, &MainWindow::slotShowProgressWindow);
     connect(dataModel, &DataModel::endMessaging, this, &MainWindow::slotCloseProgressWindow);
     //pbtnSendSanta->setEnabled(false);
