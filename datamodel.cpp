@@ -245,7 +245,7 @@ bool DataModel::mailing(QString serverAddress, int serverPort, QString serverLog
     pairing(listOfGamers);
 
     // выносим рассылку в фоновый поток
-    (void)QtConcurrent::run([&]()
+    (void)QtConcurrent::run([=]()
                       {
                         // отправка сигнала о начале вычислений
                         emit beginMessaging(0);
@@ -254,7 +254,8 @@ bool DataModel::mailing(QString serverAddress, int serverPort, QString serverLog
                         mailSend.sendSanta(listOfGamers);
 
                         // отправка сигнала с результатом
-                        emit endMessaging(*(new QList<QSharedPointer<Gamer>>), *(new QList<QSharedPointer<Gamer>>));
+                        QList<QSharedPointer<Gamer>> good, bad;
+                        emit endMessaging(good, bad);
                       });
 
     // TODO добавить очистку пар

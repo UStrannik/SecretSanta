@@ -12,30 +12,26 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
+    /* компоненты */
     DataModel       *dataModel;     // указатель на модель
     QProgressDialog *progressWindow;// указатель на окно прогресса выполнения действий
 
+    /* виджеты */
     QLabel          *plblServer;    // метка адрес сервера
     QLabel          *plblPort;      // метка порт сервера
     QLabel          *plblUser;      // метка логин сервера
     QLabel          *plblPassword;  // метка пароль сервера
-
     QLineEdit       *ptxtServer;    // поле ввода адреса сервера
     QLineEdit       *ptxtPort;      // поле ввода номера порта сервера
     QLineEdit       *ptxtUser;      // поле ввода логина
     QLineEdit       *ptxtPassword;  // поле ввода пароля
-
     QPushButton     *pbtnClearData; // кнопка очистки данных
     QPushButton     *pbtnOpenFile;  // кнопка загрузки из файла
     QPushButton     *pbtnTestMail;  // кнопка отправки тестового письма
     QPushButton     *pbtnSendSanta; // кнопка запуска рассылки
-
     QTableView       *ptbvTable;    // таблица со списком игроков
 
-    QSslSocket sslSocket;              // сокет для подключений
-
     /* работа с почтой */
-    QByteArray makeEmailBody(QString from, QString to, QString subj, QString msg);  // формирует письмо
     bool sendSmtpEmail(QString from, QString to, QString subj, QString msg);        // отправляет письмо
 
     /* работа с интерфейсом */
@@ -43,13 +39,13 @@ private:
     void clearTable();                                                              // очистка списка в окне
 
 public:
-    MainWindow(DataModel *_model, QWidget *parent = nullptr);
+    MainWindow(QWidget *parent, DataModel *_model);
 
 public slots:
-    void slotClearData();
-    void slotLoad();
-    void slotSendTest();
-    void slotSendSanta();
-    void slotShowProgressWindow();
-    void slotCloseProgressWindow();
+    void slotClearData();           // очистка списка игроков
+    void slotLoadFromFile();        // загрузщка игроков из файла
+    void slotTestEmail();           // отправка тестового письма
+    void slotSendSanta();           // запуск рассылки
+    void slotShowProgressWindow();  // отображение окна прогресса рассылки
+    void slotCloseProgressWindow(); // закрытие окна прогресса
 };

@@ -4,22 +4,7 @@
 #include <QKeyEvent>
 #include <QEvent>
 
-// создаёт тело письма
-QByteArray MainWindow::makeEmailBody(QString from, QString to, QString subj, QString msg)
-{
-    QByteArray email;
-
-    email.append("Subject: " + subj.toUtf8() + "\r\n"); // тема
-    email.append("From: " + from.toUtf8() + "\r\n");    // отправитель
-    email.append("To: " + to.toUtf8() + "\r\n");        // получатель
-    email.append("\r\n");                               // пустая строка
-    email.append(msg.toUtf8());                         // текст письма
-    email.append("\r\n.\r\n");                          // завершение письма
-
-    return email;
-}
-
-// отправка письма
+/* отправка письма
 bool MainWindow::sendSmtpEmail(QString from, QString to, QString subj, QString msg)
 {
     // отправка заголовков
@@ -45,14 +30,12 @@ bool MainWindow::sendSmtpEmail(QString from, QString to, QString subj, QString m
     // проверка успешности отправки (250 - успешно)
     return resp.contains("250");
 }
+*/
 
 // конструктор
-MainWindow::MainWindow(DataModel *_model, QWidget *parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent, DataModel *_model)
+    : QMainWindow(parent), dataModel(_model)
 {
-    // сохраняем указатель на модель
-    dataModel = _model;
-
     // заголовок окна
     setWindowTitle("Тайный Санта");
 
@@ -135,7 +118,7 @@ void MainWindow::slotClearData()
 }
 
 // слот для кнопки загрузки из файла
-void MainWindow::slotLoad()
+void MainWindow::slotLoadFromFile()
 {
     // показать диалог открытия файла
     QString filter = "Текстовый документ (*.txt);;Все файлы (*.*)";
@@ -150,7 +133,7 @@ void MainWindow::slotLoad()
 }
 
 // отправка тестового письма
-void MainWindow::slotSendTest()
+void MainWindow::slotTestEmail()
 {
     /* TODO
      * реализовать в классе работы с почтой
@@ -187,6 +170,7 @@ void MainWindow::slotSendTest()
     */
 }
 
+// запуск рассылки
 void MainWindow::slotSendSanta()
 {
     QString address = ptxtServer->text();

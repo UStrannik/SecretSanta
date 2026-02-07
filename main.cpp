@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     DataSource *dataSource = new DataSource(&app);
     DataModel *dataModel = new DataModel(dataSource, &app);
 
-    MainWindow mainWindow (dataModel);
+    MainWindow mainWindow(nullptr, dataModel);
     mainWindow.show();
     return app.exec();
 }

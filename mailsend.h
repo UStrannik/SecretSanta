@@ -13,25 +13,31 @@ public:
     explicit MailSend(QString address, int port,
                       QString login, QString pass);
 
-    void sendSanta(QList<QSharedPointer<Gamer>> listOfGamers);
+
+    void sendSanta(QList<QSharedPointer<Gamer>> _listOfGamers);
     void sendTest();
 
 private:
-    QSslSocket sslSocket;                       // сокет для подключений
     QList<QSharedPointer<Gamer>> listOfGamers;  // список указателей на игроков для рассылки
+
+    /* сеть */
+    QSslSocket sslSocket;                       // сокет для подключений по SSL
     QString serverAddress;                      // адрес сервера
     int serverPort;                             // номер порта сервера
     QString serverLogin;                        // логин для авторизации на сервере
     QString serverPassword;                     // пароль на сервере
 
-
-    QByteArray makeSantaEmail(QSharedPointer<Gamer> gamer); // формирует письмо для игрока
-    QByteArray makeTestEmail();                             // формирует тестовое письмо
+    /* SMTP */
     bool connectToSmtpServer();                             // подключается к серверу
     bool loginOnSmtpServer();                               // авторизуется на сервере
     bool sendSmtpEmail(QString from, QString to,
                        QByteArray msg);                     // отправляет письмо
     void closeSmtpConnection();                             // завершает соединение
+
+    /* письма */
+    QByteArray encodeHeader(const QString str);                // кодирует заголовки под стандарт RFC2 047
+    QByteArray makeSantaEmail(QSharedPointer<Gamer> gamer); // формирует письмо для игрока
+    QByteArray makeTestEmail();                             // формирует тестовое письмо
 
 signals:
 };
