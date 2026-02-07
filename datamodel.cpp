@@ -295,10 +295,6 @@ bool DataModel::pairing(QList<QSharedPointer<Gamer>> &listOfGamers)
         }
     }
 
-    // debug
-    for (int i = 0; i < count; i++)
-        qDebug() << i << " -> " << pair[i];
-
     // заносим указатели на пары в список
     for (int i = 0; i < count; i++)
         listOfGamers.at(i)->mailTo = listOfGamers.at(pair[i]).data();

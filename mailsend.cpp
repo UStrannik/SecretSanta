@@ -15,25 +15,10 @@ void MailSend::sendSanta(QList<QSharedPointer<Gamer> > _listOfGamers)
     // будем отправлять письма пачками по n штук в одном соединении
     // в будущем сделать настройку этого параметра
     int n = 5;
-    for (int i = 0; i < listOfGamers.size(); i += n)
-    {
-        // подключение к серверу
-        connectToSmtpServer();
+    sendForGamers(n);
 
-        // авторизация на сервере
-        loginOnSmtpServer();
-
-        // отправка пачки писем
-        for (int j = i; (j < i + n) && (j < listOfGamers.size()); j++)
-            sendSmtpEmail(listOfGamers.at(j)->mailTo->email,
-                          makeSantaEmail(listOfGamers.at(j)));
-
-        // отключение от сервера
-        closeSmtpConnection();
-    }
-
-    // debug !!!
-    //QThread::msleep(10000);
+    // отправка письма со списком пар самому себе
+    sendList();
 }
 
 // подключение к серверу SMTP
@@ -74,6 +59,10 @@ bool MailSend::loginOnSmtpServer()
 // отправляет письмо по SMTP
 bool MailSend::sendSmtpEmail(QString to, QByteArray email)
 {
+    // если нет соединения, то вернуть false
+    if (!sslSocket.isEncrypted())
+        return false;
+
     // отправка заголовков
     sslSocket.write("MAIL FROM:<" + serverLogin.toUtf8() + ">\r\n");
     sslSocket.waitForReadyRead(10000);
@@ -159,4 +148,117 @@ QByteArray MailSend::makeSantaEmail(QSharedPointer<Gamer> gamer)
     email.append("\r\n.\r\n");
 
     return email;
+}
+
+// создает письмо со с писком пар
+QByteArray MailSend::makeListEmail()
+{
+    QByteArray email;   // письмо
+    QByteArray msg;     // текст письма
+
+    for (int i = 0; i < listOfGamers.size(); i++)
+    {
+        msg.append(listOfGamers.at(i)->name.toUtf8());
+        msg.append("\t\t\t\t дарит ");
+        msg.append(listOfGamers.at(i)->mailTo->name.toUtf8());
+        msg.append("\n");
+    }
+
+    // формируем From
+    email.append("From: ");
+    email.append(encodeHeader("Тайный Санта"));
+    email.append(" <" + serverLogin.toUtf8() + ">\r\n");
+
+    // формируем To
+    email.append("To: ");
+    email.append(encodeHeader("Тайный Санта"));
+    email.append(" <" + serverLogin.toUtf8() + ">\r\n");
+
+    // формируем Subject
+    email.append("Subject: ");
+    email.append(encodeHeader("Список пар"));
+    email.append("\r\n");
+
+    // добавляем служебные заголовки
+    email.append("MIME-Version: 1.0\r\n");
+    email.append("Content-Type: text/plain; charset=UTF-8\r\n");
+    email.append("Content-Transfer-Encoding: 8bit\r\n");
+
+    // добавляем пустую строку-разделитель
+    email.append("\r\n");
+
+    // добавляем текст письма
+    email.append(msg);
+
+    // добавляем финальную точку
+    email.append("\r\n.\r\n");
+
+    return email;
+}
+
+// рассылка игрокам
+bool MailSend::sendForGamers(int n)
+{
+    for (int i = 0; i < listOfGamers.size(); i += n)
+    {
+        // подключение к серверу, если не удалось, то возврат
+        if (!connectToSmtpServer())
+        {
+            sslSocket.close();
+            qDebug() << "не удалось подключиться";
+            return false;
+        }
+
+        // авторизация на сервере, если не удалось, то возврат
+        if (!loginOnSmtpServer())
+        {
+            closeSmtpConnection();
+            qDebug() << "Не удалось авторизоваться";
+            return false;
+        }
+
+        // отправка пачки писем
+        for (int j = i; (j < i + n) && (j < listOfGamers.size()); j++)
+        {
+            // отправка письма
+            bool isGood = sendSmtpEmail(listOfGamers.at(j)->email,
+                                        makeSantaEmail(listOfGamers.at(j)));
+            // если не удалось отправить, то прекратить отправку пачки
+            if (!isGood)
+                break;
+
+            qDebug() << "Отправили успешно на " + listOfGamers.at(j)->email;
+        }
+
+        // отключение от сервера
+        closeSmtpConnection();
+    }
+    return true;
+}
+
+// отправляет организатору список пар
+bool MailSend::sendList()
+{
+    // подключение к серверу, если не удалось, то возврат
+    if (!connectToSmtpServer())
+    {
+        sslSocket.close();
+        qDebug() << "Список. Не удалось подключиться к серверу";
+        return false;
+    }
+
+    // авторизация на сервере, если не удалось, то возврат
+    if (!loginOnSmtpServer())
+    {
+        closeSmtpConnection();
+        qDebug() << "Список. Не удалось авторизоваться на сервере";
+        return false;
+    }
+
+    // пытаемся отправить список
+    bool isGood = sendSmtpEmail(serverLogin, makeListEmail());
+
+    qDebug() << "Отправка списка: " << isGood;
+
+    return isGood;
 }

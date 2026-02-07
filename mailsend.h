@@ -34,9 +34,14 @@ private:
     void closeSmtpConnection();                             // завершает соединение
 
     /* письма */
-    QByteArray encodeHeader(const QString str);                // кодирует заголовки под стандарт RFC2 047
+    QByteArray encodeHeader(const QString str);             // кодирует заголовки под стандарт RFC2 047
     QByteArray makeSantaEmail(QSharedPointer<Gamer> gamer); // формирует письмо для игрока
+    QByteArray makeListEmail();                             // формирует письмо со списком пар для организатора
     QByteArray makeTestEmail();                             // формирует тестовое письмо
+
+    /* отправка писем */
+    bool sendForGamers(int n); // отправляет письма игрокам пачками по n штук
+    bool sendList();            // отправляет список  пар
 
 signals:
 };
