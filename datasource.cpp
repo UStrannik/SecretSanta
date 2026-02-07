@@ -188,8 +188,6 @@ bool DataSource::clearData()
 void DataSource::testData()
 {
     /* загрузка из тестового файла */
-    qDebug() << "Загружено "
-             << loadFromFile("list.txt")
-             << " записей.";
+    loadFromFile("list.txt");
     /**/
 }

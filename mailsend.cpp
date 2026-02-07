@@ -1,6 +1,7 @@
 #include "mailsend.h"
 #include <QThread>
 
+// конструктор
 MailSend::MailSend(QString address, int port, QString login, QString pass) :
     serverAddress(address), serverPort(port), serverLogin(login), serverPassword(pass)
 {
@@ -223,9 +224,9 @@ bool MailSend::sendForGamers(int n)
             // отправка письма
             bool isGood = sendSmtpEmail(listOfGamers.at(j)->email,
                                         makeSantaEmail(listOfGamers.at(j)));
-            // если не удалось отправить, то прекратить отправку пачки
-            if (!isGood)
-                break;
+
+            // устанока статуса отправки для игрока
+            listOfGamers.at(j)->sended = isGood;
 
             qDebug() << "Отправили успешно на " + listOfGamers.at(j)->email;
         }

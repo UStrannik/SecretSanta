@@ -7,9 +7,10 @@
 // игрок
 struct Gamer
 {
-    QString name;   // имя
-    QString email;  // почта
-    Gamer *mailTo;  // указатель на получателя
+    bool sended = false;    // отправлено ли письмо этому игроку
+    QString name;           // имя
+    QString email;          // почта
+    Gamer *mailTo;          // указатель на получателя
 
     /*
      * названия столбцов для отображения

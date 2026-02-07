@@ -253,9 +253,8 @@ bool DataModel::mailing(QString serverAddress, int serverPort, QString serverLog
                         MailSend mailSend(serverAddress, serverPort, serverLogin, serverPassword);
                         mailSend.sendSanta(listOfGamers);
 
-                        // отправка сигнала с результатом
-                        QList<QSharedPointer<Gamer>> good, bad;
-                        emit endMessaging(good, bad);
+                        // отправка сигнала окончания
+                        emit endMessaging();
                       });
 
     // TODO добавить очистку пар

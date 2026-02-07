@@ -57,6 +57,5 @@ signals:
     void beginMessaging(int count);
 
     // высылается после окончания рассылки
-    void endMessaging(QList<QSharedPointer<Gamer>> good,
-                      QList<QSharedPointer<Gamer>> bad);
+    void endMessaging();
 };
