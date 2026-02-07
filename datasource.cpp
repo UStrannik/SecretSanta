@@ -12,7 +12,7 @@ DataSource::DataSource(QObject *parent)
     listOfGamers = new QList<QSharedPointer<Gamer>>;
 
     // загрузка тестовых данных
-    testData();
+    //testData();
 }
 
 // деструктор
