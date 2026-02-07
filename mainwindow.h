@@ -32,14 +32,11 @@ private:
 
     QTableView       *ptbvTable;    // таблица со списком игроков
 
-    QSslSocket socket;              // сокет для подключений
+    QSslSocket sslSocket;              // сокет для подключений
 
     /* работа с почтой */
     QByteArray makeEmailBody(QString from, QString to, QString subj, QString msg);  // формирует письмо
-    bool connectToSmtpServer(QString addr, QString port);                           // подключается к серверу
-    bool loginOnSmtpServer(QString login, QString password);                        // авторизуется на сервере
     bool sendSmtpEmail(QString from, QString to, QString subj, QString msg);        // отправляет письмо
-    void closeSmtpConnection();                                                     // завершает соединение
 
     /* работа с интерфейсом */
     void updateTable();                                                             // обновление списка в окне

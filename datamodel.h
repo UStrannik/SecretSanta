@@ -46,7 +46,7 @@ public:
     void clearData();
 
     // рассылка
-    bool mailing();
+    bool mailing(QString serverAddress, int serverPort, QString serverLogin, QString serverPassword);
 
 private:
     // создание пар

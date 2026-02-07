@@ -232,7 +232,7 @@ void DataModel::clearData()
 }
 
 // рассылка
-bool DataModel::mailing()
+bool DataModel::mailing(QString serverAddress, int serverPort, QString serverLogin, QString serverPassword)
 {
     // если игроков нет, то возвращаем пустоту
     if (dataSource->getCount() == 0)
@@ -247,11 +247,11 @@ bool DataModel::mailing()
     // выносим рассылку в фоновый поток
     (void)QtConcurrent::run([&]()
                       {
-                        // отправка сигнала о н ачале вычислений
+                        // отправка сигнала о начале вычислений
                         emit beginMessaging(0);
 
-                        MailSend mailSend;
-                        mailSend.sendAll(listOfGamers);
+                        MailSend mailSend(serverAddress, serverPort, serverLogin, serverPassword);
+                        mailSend.sendSanta(listOfGamers);
 
                         // отправка сигнала с результатом
                         emit endMessaging(*(new QList<QSharedPointer<Gamer>>), *(new QList<QSharedPointer<Gamer>>));

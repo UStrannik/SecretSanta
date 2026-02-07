@@ -19,71 +19,32 @@ QByteArray MainWindow::makeEmailBody(QString from, QString to, QString subj, QSt
     return email;
 }
 
-// подключаемся к серверу
-bool MainWindow::connectToSmtpServer(QString addr, QString port)
-{
-    if (socket.isOpen())    // закрыть сокет если открыт
-        socket.close();
-
-    socket.connectToHostEncrypted(addr, port.toInt());  // подключиться
-    socket.waitForConnected();
-
-    return socket.isOpen();     // вернуть результат
-}
-
-// авторизуемся на сервере
-bool MainWindow::loginOnSmtpServer(QString login, QString password)
-{
-    // авторизация по SMTP
-    socket.write("EHLO myapp\r\n");
-    socket.waitForReadyRead();
-    socket.write("AUTH LOGIN\r\n");
-    socket.waitForReadyRead();
-    socket.write(login.toUtf8().toBase64() + "\r\n");
-    socket.waitForReadyRead();
-    socket.write(password.toUtf8().toBase64() + "\r\n");
-    socket.waitForReadyRead();
-
-    // проверка успешности авторизации
-    QString resp = QString::fromUtf8(socket.readAll());
-    return !resp.contains("535");
-}
-
 // отправка письма
 bool MainWindow::sendSmtpEmail(QString from, QString to, QString subj, QString msg)
 {
     // отправка заголовков
-    socket.write("MAIL FROM:<" + from.toUtf8() + ">\r\n");
-    socket.waitForReadyRead(10000);
-    socket.write("RCPT TO:<" + to.toUtf8() + ">\r\n");
-    socket.waitForReadyRead(10000);
-    socket.write("DATA\r\n");
-    socket.waitForReadyRead(10000);
+    sslSocket.write("MAIL FROM:<" + from.toUtf8() + ">\r\n");
+    sslSocket.waitForReadyRead(10000);
+    sslSocket.write("RCPT TO:<" + to.toUtf8() + ">\r\n");
+    sslSocket.waitForReadyRead(10000);
+    sslSocket.write("DATA\r\n");
+    sslSocket.waitForReadyRead(10000);
 
     // отправка письма
     QByteArray eml = makeEmailBody(from, to, subj, msg);
-    socket.write(eml);
-    socket.waitForReadyRead(10000);
+    sslSocket.write(eml);
+    sslSocket.waitForReadyRead(10000);
 
     // получение ответа сервера
-    QString resp = QString::fromUtf8(socket.readAll());
+    QString resp = QString::fromUtf8(sslSocket.readAll());
 
     // сброс соединения
-    socket.write("RSET\r\n");
-    socket.waitForReadyRead();
+    sslSocket.write("RSET\r\n");
+    sslSocket.waitForReadyRead();
 
     // проверка успешности отправки (250 - успешно)
     return resp.contains("250");
 }
-
-// завершение соединения с SMTP сервером
-void MainWindow::closeSmtpConnection()
-{
-    socket.write("QUIT\r\n");
-    socket.waitForReadyRead();
-    socket.close();
-}
-
 
 // конструктор
 MainWindow::MainWindow(DataModel *_model, QWidget *parent)
@@ -228,7 +189,40 @@ void MainWindow::slotSendTest()
 
 void MainWindow::slotSendSanta()
 {
-    dataModel->mailing();
+    QString address = ptxtServer->text();
+    int port = ptxtPort->text().toInt();
+    QString login = ptxtUser->text();
+    QString password = ptxtPassword->text();
+
+    // проверяем указаны ли данные сервера
+    if (address.isEmpty())
+    {
+        QMessageBox::critical(this, "Ошибка!", "Указан некорректный адрес сервера!",
+                             QMessageBox::Ok);
+        return;
+    }
+    if (port <= 0)
+    {
+        QMessageBox::critical(this, "Ошибка!", "Указан некорректный порт сервера!",
+                              QMessageBox::Ok);
+        return;
+    }
+
+    // проверяем указаны ли логин и пароль сервера
+    if (login.isEmpty())
+    {
+        QMessageBox::critical(this, "Ошибка!", "Указан некорректный логин!",
+                              QMessageBox::Ok);
+        return;
+    }
+    if (password.isEmpty())
+    {
+        QMessageBox::critical(this, "Ошибка!", "Указан некорректный пароль!",
+                              QMessageBox::Ok);
+        return;
+    }
+
+    dataModel->mailing(address, port, login, password);
     /* TODO
      * вынести в отдельный класс
     QString allList = "";
