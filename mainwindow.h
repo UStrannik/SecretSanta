@@ -31,13 +31,6 @@ private:
     QPushButton     *pbtnSendSanta; // кнопка запуска рассылки
     QTableView       *ptbvTable;    // таблица со списком игроков
 
-    /* работа с почтой */
-    bool sendSmtpEmail(QString from, QString to, QString subj, QString msg);        // отправляет письмо
-
-    /* работа с интерфейсом */
-    void updateTable();                                                             // обновление списка в окне
-    void clearTable();                                                              // очистка списка в окне
-
 public:
     MainWindow(QWidget *parent, DataModel *_model);
 

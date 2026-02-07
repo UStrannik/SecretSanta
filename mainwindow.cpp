@@ -4,34 +4,6 @@
 #include <QKeyEvent>
 #include <QEvent>
 
-/* отправка письма
-bool MainWindow::sendSmtpEmail(QString from, QString to, QString subj, QString msg)
-{
-    // отправка заголовков
-    sslSocket.write("MAIL FROM:<" + from.toUtf8() + ">\r\n");
-    sslSocket.waitForReadyRead(10000);
-    sslSocket.write("RCPT TO:<" + to.toUtf8() + ">\r\n");
-    sslSocket.waitForReadyRead(10000);
-    sslSocket.write("DATA\r\n");
-    sslSocket.waitForReadyRead(10000);
-
-    // отправка письма
-    QByteArray eml = makeEmailBody(from, to, subj, msg);
-    sslSocket.write(eml);
-    sslSocket.waitForReadyRead(10000);
-
-    // получение ответа сервера
-    QString resp = QString::fromUtf8(sslSocket.readAll());
-
-    // сброс соединения
-    sslSocket.write("RSET\r\n");
-    sslSocket.waitForReadyRead();
-
-    // проверка успешности отправки (250 - успешно)
-    return resp.contains("250");
-}
-*/
-
 // конструктор
 MainWindow::MainWindow(QWidget *parent, DataModel *_model)
     : QMainWindow(parent), dataModel(_model)

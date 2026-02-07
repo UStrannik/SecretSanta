@@ -10,7 +10,7 @@ MailSend::MailSend(QString address, int port, QString login, QString pass) :
 void MailSend::sendSanta(QList<QSharedPointer<Gamer> > _listOfGamers)
 {
     // перемещаем полученный список игроков
-    listOfGamers = _listOfGamers;
+    listOfGamers = std::move(_listOfGamers);
 
     // debug !!!
     QThread::msleep(10000);
@@ -49,6 +49,32 @@ bool MailSend::loginOnSmtpServer()
     // проверка успешности авторизации
     QString resp = QString::fromUtf8(sslSocket.readAll());
     return !resp.contains("535");
+}
+
+// отправляет письмо по SMTP
+bool MailSend::sendSmtpEmail(QString from, QString to, QByteArray email)
+{
+    // отправка заголовков
+    sslSocket.write("MAIL FROM:<" + from.toUtf8() + ">\r\n");
+    sslSocket.waitForReadyRead(10000);
+    sslSocket.write("RCPT TO:<" + to.toUtf8() + ">\r\n");
+    sslSocket.waitForReadyRead(10000);
+    sslSocket.write("DATA\r\n");
+    sslSocket.waitForReadyRead(10000);
+
+    // отправка письма
+    sslSocket.write(email);
+    sslSocket.waitForReadyRead(10000);
+
+    // получение ответа сервера
+    QString resp = QString::fromUtf8(sslSocket.readAll());
+
+    // сброс соединения
+    sslSocket.write("RSET\r\n");
+    sslSocket.waitForReadyRead();
+
+    // проверка успешности отправки (250 - успешно)
+    return resp.contains("250");
 }
 
 // завершает соединение с SMTP сервером
