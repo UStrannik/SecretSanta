@@ -255,7 +255,7 @@ bool DataModel::mailing(QString serverAddress, int serverPort, QString serverLog
                         emit beginMessaging(0);
 
                         MailSend mailSend(serverAddress, serverPort, serverLogin, serverPassword);
-                        mailSend.sendSanta(listOfGamers);
+                        mailSend.sendSmtpSanta(listOfGamers);
 
                         // отправка сигнала окончания
                         emit endMessaging();
@@ -268,6 +268,15 @@ bool DataModel::mailing(QString serverAddress, int serverPort, QString serverLog
 
     return true;
 
+}
+
+// отправка тестового сообщения
+bool DataModel::testMessage(QString serverAddress, int serverPort, QString serverLogin, QString serverPassword)
+{
+    // отправка без создания потока т.к. отправляем одно сообщение для теста
+    MailSend mailSend(serverAddress, serverPort, serverLogin, serverPassword);
+
+    return mailSend.sendSmtpTest();
 }
 
 // создание пар

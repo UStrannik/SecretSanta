@@ -14,8 +14,11 @@ public:
                       QString login, QString pass);
 
 
-    void sendSanta(QList<QSharedPointer<Gamer>> _listOfGamers);
-    void sendTest();
+    // рассылка игрокам через SMTP
+    void sendSmtpSanta(QList<QSharedPointer<Gamer>> _listOfGamers);
+
+    // отправка тестового письма через SMTP
+    bool sendSmtpTest();
 
 private:
     QList<QSharedPointer<Gamer>> listOfGamers;  // список указателей на игроков для рассылки
@@ -30,7 +33,7 @@ private:
     /* SMTP */
     bool connectToSmtpServer();                             // подключается к серверу
     bool loginOnSmtpServer();                               // авторизуется на сервере
-    bool sendSmtpEmail(QString to, QByteArray msg);         // отправляет письмо
+    bool sendSmtpData(QString to, QByteArray msg);         // отправляет письмо через установленное подключение
     void closeSmtpConnection();                             // завершает соединение
 
     /* письма */
@@ -40,8 +43,9 @@ private:
     QByteArray makeTestEmail();                             // формирует тестовое письмо
 
     /* отправка писем */
-    bool sendForGamers(int n); // отправляет письма игрокам пачками по n штук
-    bool sendList();            // отправляет список  пар
+    bool sendForGamers(int n);          // отправляет письма игрокам пачками по n штук
+    bool sendSmtpMsg(QString to,
+                     QByteArray msg);   // подключается и отправляет одиночное письмо
 
 signals:
 };

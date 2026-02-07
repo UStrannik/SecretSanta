@@ -4,6 +4,45 @@
 #include <QKeyEvent>
 #include <QEvent>
 
+// проверка ввел ли пользователь данные сервера
+bool MainWindow::checkServer()
+{
+    QString address = ptxtServer->text();
+    int port = ptxtPort->text().toInt();
+    QString login = ptxtUser->text();
+    QString password = ptxtPassword->text();
+
+    // проверяем указаны ли данные сервера
+    if (address.isEmpty())
+    {
+        QMessageBox::critical(this, "Ошибка!", "Указан некорректный адрес сервера!",
+                              QMessageBox::Ok);
+        return false;
+    }
+    if (port <= 0)
+    {
+        QMessageBox::critical(this, "Ошибка!", "Указан некорректный порт сервера!",
+                              QMessageBox::Ok);
+        return false;
+    }
+
+    // проверяем указаны ли логин и пароль сервера
+    if (login.isEmpty())
+    {
+        QMessageBox::critical(this, "Ошибка!", "Указан некорректный логин!",
+                              QMessageBox::Ok);
+        return false;
+    }
+    if (password.isEmpty())
+    {
+        QMessageBox::critical(this, "Ошибка!", "Указан некорректный пароль!",
+                              QMessageBox::Ok);
+        return false;
+    }
+
+    return true;
+}
+
 // конструктор
 MainWindow::MainWindow(QWidget *parent, DataModel *_model)
     : QMainWindow(parent), dataModel(_model)
@@ -108,128 +147,35 @@ void MainWindow::slotLoadFromFile()
 // отправка тестового письма
 void MainWindow::slotTestEmail()
 {
-    /* TODO
-     * реализовать в классе работы с почтой
-     *
-    // попытка подключения к серверу
-    if (!connectToSmtpServer(ptxtServer->text(), ptxtPort->text()))
-    {
-        QMessageBox::warning(this, "Ошибка", "Не удалось подключиться к серверу!", QMessageBox::Ok);
-        closeSmtpConnection();
+    // если пользователь не ввел данные для подключения, то вернуться
+    if (!checkServer())
         return;
-    }
 
-    // попытка авторизации на сервере
-    if (!loginOnSmtpServer(ptxtUser->text(), ptxtPassword->text()))
-    {
-        QMessageBox::warning(this, "Ошибка", "Неверный логин или пароль!", QMessageBox::Ok);
-        closeSmtpConnection();
-        return;
-    }
-
-    // попытка отправить письмо
-    if (!sendSmtpEmail(ptxtUser->text(), ptxtUser->text(), "Тайный Санта", "Тестовое письмо"))
-    {
-        QMessageBox::warning(this, "Ошибка", "Не удалось отправить письмо!", QMessageBox::Ok);
-        closeSmtpConnection();
-    }
-
-    // завершение соединения
-    closeSmtpConnection();
-
-    // уведомление об успехе
-    QMessageBox::information(this, "Информация", "Тестовое письмо отправлено, проверьте почтовый ящик.", QMessageBox::Ok);
-
-    */
-}
-
-// запуск рассылки
-void MainWindow::slotSendSanta()
-{
+    // получить данные для подключения
     QString address = ptxtServer->text();
     int port = ptxtPort->text().toInt();
     QString login = ptxtUser->text();
     QString password = ptxtPassword->text();
 
-    // проверяем указаны ли данные сервера
-    if (address.isEmpty())
-    {
-        QMessageBox::critical(this, "Ошибка!", "Указан некорректный адрес сервера!",
-                             QMessageBox::Ok);
-        return;
-    }
-    if (port <= 0)
-    {
-        QMessageBox::critical(this, "Ошибка!", "Указан некорректный порт сервера!",
-                              QMessageBox::Ok);
-        return;
-    }
+    // попросить подель запустить рассылку
+    dataModel->testMessage(address, port, login, password);
+}
 
-    // проверяем указаны ли логин и пароль сервера
-    if (login.isEmpty())
-    {
-        QMessageBox::critical(this, "Ошибка!", "Указан некорректный логин!",
-                              QMessageBox::Ok);
+// запуск рассылки
+void MainWindow::slotSendSanta()
+{
+    // если пользователь не ввел данные для подключения, то вернуться
+    if (!checkServer())
         return;
-    }
-    if (password.isEmpty())
-    {
-        QMessageBox::critical(this, "Ошибка!", "Указан некорректный пароль!",
-                              QMessageBox::Ok);
-        return;
-    }
 
+    // получить данные для подключения
+    QString address = ptxtServer->text();
+    int port = ptxtPort->text().toInt();
+    QString login = ptxtUser->text();
+    QString password = ptxtPassword->text();
+
+    // попросить подель запустить рассылку
     dataModel->mailing(address, port, login, password);
-    /* TODO
-     * вынести в отдельный класс
-    QString allList = "";
-
-    QString sender = ptxtUser->text();
-
-    //пробуем подключиться к серверу
-    if (!connectToSmtpServer(ptxtServer->text(), ptxtPort->text()))
-    {
-        QMessageBox::warning(this, "Ошибка", "Не удалось подключиться к серверу. Письма не отправлены!",
-                             QMessageBox::Ok);
-        return;
-    }
-
-    // пробуем авторизоваться на сервере
-    if (!loginOnSmtpServer(ptxtUser->text(), ptxtPassword->text()))
-    {
-        QMessageBox::warning(this, "Ошибка", "Неверный логин или пароль. Письма не отправлены!",
-                             QMessageBox::Ok);
-        return;
-    }
-
-    // если размеры списков не совпадают, то что-то не так и рассылку делать нельзя
-    if (from.size() != to.size())
-    {
-        QMessageBox::warning(this, "Ошибка", "Ошибка обработки данных. Обратитесь к разработчику.",
-                             QMessageBox::Ok);
-        return;
-    }
-
-    // проход по списку и рассылка
-    for (int i = 0; i < from.size(); ++i)
-    {
-        if (!sendSmtpEmail(sender, from[i]->email, "Secret Santa", "Your recipient: " + to[i]->name))
-            QMessageBox::warning(this, "Warning",
-                                 "E-Mail to " + from[i]->name + "<" + from[i]->email + ">" + " not sended!",
-                                 QMessageBox::Ok);
-
-        allList += from[i]->name + " -> " + to[i]->name + "\n";
-    }
-
-    // отправка списка
-    if (!sendSmtpEmail(sender, ptxtUser->text().toUtf8(), "Secret Santa list", allList))
-        QMessageBox::warning(this, "Warning", "Self-message with all-list not sended!", QMessageBox::Ok);
-
-    closeSmtpConnection(); // завершение соединения
-
-    pbtnSendSanta->setEnabled(false);
-
-    */
 }
 
 // отобразить окно процесса

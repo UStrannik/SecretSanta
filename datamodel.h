@@ -48,6 +48,9 @@ public:
     // рассылка
     bool mailing(QString serverAddress, int serverPort, QString serverLogin, QString serverPassword);
 
+    // тестовое сообщение
+    bool testMessage(QString serverAddress, int serverPort, QString serverLogin, QString serverPassword);
+
 private:
     // создание пар
     bool pairing(QList<QSharedPointer<Gamer>> &listOfGamers);

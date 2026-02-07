@@ -8,7 +8,8 @@ MailSend::MailSend(QString address, int port, QString login, QString pass) :
     //
 }
 
-void MailSend::sendSanta(QList<QSharedPointer<Gamer> > _listOfGamers)
+// расслыка игрокам через SMTP
+void MailSend::sendSmtpSanta(QList<QSharedPointer<Gamer> > _listOfGamers)
 {
     // перемещаем полученный список игроков
     listOfGamers = std::move(_listOfGamers);
@@ -19,7 +20,13 @@ void MailSend::sendSanta(QList<QSharedPointer<Gamer> > _listOfGamers)
     sendForGamers(n);
 
     // отправка письма со списком пар самому себе
-    sendList();
+    sendSmtpMsg(serverLogin, makeListEmail());
+}
+
+// отправка тестового письма через SMTP
+bool MailSend::sendSmtpTest()
+{
+    return sendSmtpMsg(serverLogin, makeTestEmail());
 }
 
 // подключение к серверу SMTP
@@ -57,8 +64,8 @@ bool MailSend::loginOnSmtpServer()
     return !resp.contains("535");
 }
 
-// отправляет письмо по SMTP
-bool MailSend::sendSmtpEmail(QString to, QByteArray email)
+// отправляет письмо по SMTP через установленное подключение
+bool MailSend::sendSmtpData(QString to, QByteArray email)
 {
     // если нет соединения, то вернуть false
     if (!sslSocket.isEncrypted())
@@ -160,7 +167,7 @@ QByteArray MailSend::makeListEmail()
     for (int i = 0; i < listOfGamers.size(); i++)
     {
         msg.append(listOfGamers.at(i)->name.toUtf8());
-        msg.append("\t\t\t\t дарит ");
+        msg.append(" -->> ");
         msg.append(listOfGamers.at(i)->mailTo->name.toUtf8());
         msg.append("\n");
     }
@@ -197,6 +204,43 @@ QByteArray MailSend::makeListEmail()
     return email;
 }
 
+// создает тестовое письмо
+QByteArray MailSend::makeTestEmail()
+{
+    QByteArray email;   // письмо
+
+    // формируем From
+    email.append("From: ");
+    email.append(encodeHeader("Тайный Санта"));
+    email.append(" <" + serverLogin.toUtf8() + ">\r\n");
+
+    // формируем To
+    email.append("To: ");
+    email.append(encodeHeader("Тайный Санта"));
+    email.append(" <" + serverLogin.toUtf8() + ">\r\n");
+
+    // формируем Subject
+    email.append("Subject: ");
+    email.append(encodeHeader("Проверка связи"));
+    email.append("\r\n");
+
+    // добавляем служебные заголовки
+    email.append("MIME-Version: 1.0\r\n");
+    email.append("Content-Type: text/plain; charset=UTF-8\r\n");
+    email.append("Content-Transfer-Encoding: 8bit\r\n");
+
+    // добавляем пустую строку-разделитель
+    email.append("\r\n");
+
+    // добавляем текст письма
+    email.append("Если вы читаете этот текст, то соединение настроено правильно.");
+
+    // добавляем финальную точку
+    email.append("\r\n.\r\n");
+
+    return email;
+}
+
 // рассылка игрокам
 bool MailSend::sendForGamers(int n)
 {
@@ -222,7 +266,7 @@ bool MailSend::sendForGamers(int n)
         for (int j = i; (j < i + n) && (j < listOfGamers.size()); j++)
         {
             // отправка письма
-            bool isGood = sendSmtpEmail(listOfGamers.at(j)->email,
+            bool isGood = sendSmtpData(listOfGamers.at(j)->email,
                                         makeSantaEmail(listOfGamers.at(j)));
 
             // устанока статуса отправки для игрока
@@ -238,7 +282,7 @@ bool MailSend::sendForGamers(int n)
 }
 
 // отправляет организатору список пар
-bool MailSend::sendList()
+bool MailSend::sendSmtpMsg(QString to, QByteArray msg)
 {
     // успешность отправки
     bool isGood;
@@ -247,7 +291,7 @@ bool MailSend::sendList()
         if (!connectToSmtpServer())
         {
             sslSocket.close();
-            qDebug() << "Список. Не удалось подключиться к серверу";
+            qDebug() << "Не удалось подключиться к серверу";
             return false;
         }
 
@@ -255,14 +299,14 @@ bool MailSend::sendList()
         if (!loginOnSmtpServer())
         {
             closeSmtpConnection();
-            qDebug() << "Список. Не удалось авторизоваться на сервере";
+            qDebug() << "Не удалось авторизоваться на сервере";
             return false;
         }
 
         // пытаемся отправить список
-        isGood = sendSmtpEmail(serverLogin, makeListEmail());
+        isGood = sendSmtpData(to, msg);
 
-        qDebug() << "Отправка списка: " << isGood;
+        qDebug() << "Отправка письма: " << isGood;
 
     return isGood;
 }

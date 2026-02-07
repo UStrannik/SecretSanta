@@ -29,7 +29,9 @@ private:
     QPushButton     *pbtnOpenFile;  // кнопка загрузки из файла
     QPushButton     *pbtnTestMail;  // кнопка отправки тестового письма
     QPushButton     *pbtnSendSanta; // кнопка запуска рассылки
-    QTableView       *ptbvTable;    // таблица со списком игроков
+    QTableView      *ptbvTable;     // таблица со списком игроков
+
+    bool checkServer();             // проверяет ввел ли пользователь данные для подключения к серверу
 
 public:
     MainWindow(QWidget *parent, DataModel *_model);
