@@ -34,3 +34,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     CHANGELOG.md \
     README.md
+
+RESOURCES += \
+    resources.qrc
+
+win32: RC_ICONS = icons\santa.ico

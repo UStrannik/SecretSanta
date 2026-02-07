@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent, DataModel *_model)
 {
     // заголовок окна
     setWindowTitle("Тайный Санта");
+    setWindowIcon(QIcon("://icons/santa.ico"));
 
     // создание основного виджета
     QWidget *pwgtMain = new QWidget;
