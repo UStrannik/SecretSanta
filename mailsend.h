@@ -30,8 +30,7 @@ private:
     /* SMTP */
     bool connectToSmtpServer();                             // подключается к серверу
     bool loginOnSmtpServer();                               // авторизуется на сервере
-    bool sendSmtpEmail(QString from, QString to,
-                       QByteArray msg);                     // отправляет письмо
+    bool sendSmtpEmail(QString to, QByteArray msg);         // отправляет письмо
     void closeSmtpConnection();                             // завершает соединение
 
     /* письма */

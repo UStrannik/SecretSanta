@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent, DataModel *_model)
     QHBoxLayout *pltData = new QHBoxLayout;
     pbtnClearData = new QPushButton("Очистить список...");
     connect(pbtnClearData, &QPushButton::clicked, this, &MainWindow::slotClearData);
-    pbtnClearData->setVisible(false);   // в версии 1.0.1 не должно быть этого функционала
+    //pbtnClearData->setVisible(false);   // в версии 1.0.1 не должно быть этого функционала
     pltData->addWidget(pbtnClearData);
     pbtnOpenFile = new QPushButton("Загрузить из файла...");
     connect(pbtnOpenFile, &QPushButton::clicked, this, &MainWindow::slotLoadFromFile);

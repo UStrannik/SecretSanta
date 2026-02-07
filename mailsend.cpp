@@ -12,8 +12,28 @@ void MailSend::sendSanta(QList<QSharedPointer<Gamer> > _listOfGamers)
     // перемещаем полученный список игроков
     listOfGamers = std::move(_listOfGamers);
 
+    // будем отправлять письма пачками по n штук в одном соединении
+    // в будущем сделать настройку этого параметра
+    int n = 5;
+    for (int i = 0; i < listOfGamers.size(); i += n)
+    {
+        // подключение к серверу
+        connectToSmtpServer();
+
+        // авторизация на сервере
+        loginOnSmtpServer();
+
+        // отправка пачки писем
+        for (int j = i; (j < i + n) && (j < listOfGamers.size()); j++)
+            sendSmtpEmail(listOfGamers.at(j)->mailTo->email,
+                          makeSantaEmail(listOfGamers.at(j)));
+
+        // отключение от сервера
+        closeSmtpConnection();
+    }
+
     // debug !!!
-    QThread::msleep(10000);
+    //QThread::msleep(10000);
 }
 
 // подключение к серверу SMTP
@@ -52,10 +72,10 @@ bool MailSend::loginOnSmtpServer()
 }
 
 // отправляет письмо по SMTP
-bool MailSend::sendSmtpEmail(QString from, QString to, QByteArray email)
+bool MailSend::sendSmtpEmail(QString to, QByteArray email)
 {
     // отправка заголовков
-    sslSocket.write("MAIL FROM:<" + from.toUtf8() + ">\r\n");
+    sslSocket.write("MAIL FROM:<" + serverLogin.toUtf8() + ">\r\n");
     sslSocket.waitForReadyRead(10000);
     sslSocket.write("RCPT TO:<" + to.toUtf8() + ">\r\n");
     sslSocket.waitForReadyRead(10000);
@@ -106,7 +126,7 @@ QByteArray MailSend::makeSantaEmail(QSharedPointer<Gamer> gamer)
     QByteArray email;   // письмо
     QString msg;        // текст письма
 
-    msg = QString("Вы должны подарить подурок ") + gamer->mailTo->name +
+    msg = QString("Вы должны подготовить подарок для ") + gamer->mailTo->name +
           QString("!");
 
     // формируем From
