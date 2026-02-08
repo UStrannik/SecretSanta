@@ -1,11 +1,17 @@
-#include "secretsanta.h"
+#include "datamodel.h"
+#include "datasource.h"
+#include "mainwindow.h"
 
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    SecretSanta win;
-    win.show();
+
+    DataSource *dataSource = new DataSource(&app);
+    DataModel *dataModel = new DataModel(dataSource, &app);
+
+    MainWindow mainWindow(nullptr, dataModel);
+    mainWindow.show();
     return app.exec();
 }

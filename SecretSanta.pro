@@ -1,5 +1,6 @@
 QT       += core gui
 QT       += network
+QT       += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,12 +11,20 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    datamodel.cpp \
+    datasource.cpp \
+    gamer.cpp \
+    mailsend.cpp \
     main.cpp \
-    secretsanta.cpp
+    mainwindow.cpp
 
 HEADERS += \
+    datamodel.h \
+    datasource.h \
     delegats.h \
-    secretsanta.h
+    gamer.h \
+    mailsend.h \
+    mainwindow.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -25,3 +34,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     CHANGELOG.md \
     README.md
+
+RESOURCES += \
+    resources.qrc
+
+win32: RC_ICONS = icons\santa.ico
