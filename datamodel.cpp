@@ -7,9 +7,9 @@
 
 // конструктор
 DataModel::DataModel(DataSource *_data, QObject *parent)
-    : QAbstractTableModel{parent}
+    : QAbstractTableModel{parent}, dataSource(_data)
 {
-    dataSource = _data;
+    //
 }
 
 // количество строк
